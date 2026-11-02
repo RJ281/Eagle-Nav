@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:eaglenav/features/navigation/presentation/navigation_screen.dart';
 import 'favorites_tab.dart';
-import 'events_screen.dart';
 import 'profile_tab.dart';
 import 'emergency_tab.dart';
 
@@ -18,7 +17,6 @@ class _MainShellState extends State<MainShell> {
   static const List<Widget> _pages = [
     NavigationScreen(),
     FavoritesTab(),
-    EventsScreen(),
     ProfileTab(),
     EmergencyTab(),
   ];
@@ -32,7 +30,10 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: _onItemTapped,
@@ -43,13 +44,13 @@ class _MainShellState extends State<MainShell> {
             if (states.contains(WidgetState.selected)) {
               return const TextStyle(
                 color: Color(0xFFC9A227),
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
               );
             }
             return const TextStyle(
               color: Colors.white54,
-              fontSize: 11,
+              fontSize: 13,
             );
           }),
           destinations: const [
@@ -64,14 +65,9 @@ class _MainShellState extends State<MainShell> {
               label: 'Favorites',
             ),
             NavigationDestination(
-              icon: Icon(Icons.event_outlined, color: Colors.white54),
-              selectedIcon: Icon(Icons.event, color: Colors.black),
-              label: 'Events',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline, color: Colors.white54),
-              selectedIcon: Icon(Icons.person, color: Colors.black),
-              label: 'Profile',
+              icon: Icon(Icons.settings_outlined, color: Colors.white54),
+              selectedIcon: Icon(Icons.settings, color: Colors.black),
+              label: 'Settings',
             ),
             NavigationDestination(
               icon: Icon(Icons.shield_outlined, color: Colors.white54),

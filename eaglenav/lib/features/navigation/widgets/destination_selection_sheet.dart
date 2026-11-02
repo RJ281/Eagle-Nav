@@ -57,7 +57,7 @@ class DestinationSelectionSheet extends StatelessWidget {
                     children: [
                       const Text(
                         'Destination',
-                        style: TextStyle(color: Colors.white54, fontSize: 11),
+                        style: TextStyle(color: Colors.white54, fontSize: 13),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -73,9 +73,11 @@ class DestinationSelectionSheet extends StatelessWidget {
                   ),
                 ),
                 if (!isNavigating)
-                  GestureDetector(
-                    onTap: onCancel,
-                    child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                  IconButton(
+                    onPressed: onCancel,
+                    tooltip: 'Cancel destination',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    icon: const Icon(Icons.close, color: Colors.white54, size: 20),
                   ),
               ],
             ),
@@ -88,11 +90,13 @@ class DestinationSelectionSheet extends StatelessWidget {
               children: [
                 const Icon(Icons.directions_walk, size: 18, color: Colors.black45),
                 const SizedBox(width: 6),
-                const Text(
-                  'Walking distance: -- mins',
-                  style: TextStyle(color: Colors.black54, fontSize: 13),
+                const Expanded(
+                  child: Text(
+                    'Walking distance: -- mins',
+                    style: TextStyle(color: Colors.black54, fontSize: 15),
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -100,10 +104,11 @@ class DestinationSelectionSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.accessible, size: 13, color: Colors.black54),
                       SizedBox(width: 4),
-                      Text('Accessible', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text('Accessible', style: TextStyle(fontSize: 13, color: Colors.black54)),
                     ],
                   ),
                 ),

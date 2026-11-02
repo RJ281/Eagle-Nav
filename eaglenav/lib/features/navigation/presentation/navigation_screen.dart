@@ -370,9 +370,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      body: GestureDetector(
-        onDoubleTap: () => _navVoice.announceCurrentHeading(),
-        child: Stack(
+      body: Stack(
           children: [
             // ── Map — position updated imperatively via mapController ──
             FlutterMap(
@@ -551,6 +549,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           (isNavigating || isDestinationSelected) ? 240 : 100,
                       child: FloatingActionButton(
                         heroTag: 'recenter_btn_safe',
+                        tooltip: 'Recenter map on my location',
                         backgroundColor: const Color(0xFF1A1A1A),
                         elevation: 4,
                         onPressed: () {
@@ -583,7 +582,21 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       child: Column(
                         children: [
                           FloatingActionButton(
+                            heroTag: 'announce_heading',
+                            tooltip: 'Announce my heading',
+                            mini: true,
+                            backgroundColor: const Color(0xFF1A1A1A),
+                            elevation: 4,
+                            onPressed: () => _navVoice.announceCurrentHeading(),
+                            child: const Icon(
+                              Icons.explore,
+                              color: Color(0xFFC9A227),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          FloatingActionButton(
                             heroTag: 'zoom_in',
+                            tooltip: 'Zoom in',
                             mini: true,
                             backgroundColor: const Color(0xFF1A1A1A),
                             elevation: 4,
@@ -593,6 +606,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           const SizedBox(height: 10),
                           FloatingActionButton(
                             heroTag: 'zoom_out',
+                            tooltip: 'Zoom out',
                             mini: true,
                             backgroundColor: const Color(0xFF1A1A1A),
                             elevation: 4,
@@ -627,35 +641,40 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       ),
                     ),
 
-                    // ── Turn-by-turn panel ────────────────────
-                    if (currentStep != null && isNavigating)
-                      Positioned(
-                        top: 76,
-                        left: 16,
-                        right: 16,
-                        child: ListenableBuilder(
-                          listenable: Listenable.merge([
-                            _navVoice,
-                            _routingController,
-                          ]),
-                          builder: (context, _) => _TurnByTurnPanel(
-                            instruction: _navVoice.lastDisplayText.isNotEmpty
-                                ? _navVoice.lastDisplayText
-                                : currentStep.instruction,
-                            distanceMeters: currentStep.distanceMeters,
-                            isRerouting: _routingController.isRerouting,
-                          ),
-                        ),
+                    // ── Rerouting banner + turn-by-turn panel ──
+                    Positioned(
+                      top: topPadding + 16,
+                      left: 16,
+                      right: 16,
+                      child: ListenableBuilder(
+                        listenable: Listenable.merge([
+                          _navVoice,
+                          _routingController,
+                        ]),
+                        builder: (context, _) {
+                          final isRerouting = _routingController.isRerouting;
+                          final showPanel = currentStep != null && isNavigating;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (isRerouting) const _ReroutingBanner(),
+                              if (isRerouting && showPanel)
+                                const SizedBox(height: 8),
+                              if (currentStep != null && isNavigating)
+                                _TurnByTurnPanel(
+                                  instruction:
+                                      _navVoice.lastDisplayText.isNotEmpty
+                                      ? _navVoice.lastDisplayText
+                                      : currentStep.instruction,
+                                  distanceMeters: currentStep.distanceMeters,
+                                  isRerouting: isRerouting,
+                                ),
+                            ],
+                          );
+                        },
                       ),
-
-                    // ── Rerouting banner ──────────────────────
-                    if (_routingController.isRerouting)
-                      const Positioned(
-                        top: 76,
-                        left: 16,
-                        right: 16,
-                        child: _ReroutingBanner(),
-                      ),
+                    ),
                   ],
                 );
               },
@@ -673,7 +692,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
               ),
           ],
         ),
-      ),
     );
   }
 }
@@ -698,9 +716,25 @@ class _TurnByTurnPanel extends StatelessWidget {
     return '${meters.toStringAsFixed(0)} m';
   }
 
+  String _spokenDistance(double meters) {
+    if (meters >= 1000) {
+      return '${(meters / 1000).toStringAsFixed(1)} kilometers';
+    }
+    final rounded = meters.round();
+    return '$rounded ${rounded == 1 ? 'meter' : 'meters'}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final spoken = distanceMeters != null
+        ? '$instruction in ${_spokenDistance(distanceMeters!)}'
+        : instruction;
+
+    return Semantics(
+      liveRegion: true,
+      label: spoken,
+      excludeSemantics: true,
+      child: Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(16),
@@ -755,6 +789,7 @@ class _TurnByTurnPanel extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -764,7 +799,11 @@ class _ReroutingBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Semantics(
+      liveRegion: true,
+      label: 'Recalculating route',
+      excludeSemantics: true,
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.orange.shade800,
@@ -794,6 +833,7 @@ class _ReroutingBanner extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
