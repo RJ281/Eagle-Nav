@@ -258,11 +258,10 @@ class _SettingSwitch extends StatelessWidget {
     return SwitchListTile(
       title: Text(title, style: const TextStyle(fontSize: 15)),
       subtitle: subtitle != null
-          ? Text(subtitle!, style: const TextStyle(fontSize: 12, color: Colors.black45))
+          ? Text(subtitle!, style: const TextStyle(fontSize: 14, color: Colors.black45))
           : null,
       value: value,
       onChanged: onChanged,
-      dense: true,
     );
   }
 }

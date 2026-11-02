@@ -273,9 +273,7 @@ class _ScanOverlayState extends State<ScanOverlay> {
     final topPad = MediaQuery.of(context).padding.top;
     final botPad = MediaQuery.of(context).padding.bottom;
 
-    return GestureDetector(
-      onTap: widget.onDismiss,
-      child: Stack(
+    return Stack(
         children: [
           // ── Primary camera: detection model ──────────────────
           SizedBox.expand(
@@ -363,30 +361,33 @@ class _ScanOverlayState extends State<ScanOverlay> {
                       ),
                       Text(
                         'Summarizes every 4 seconds',
-                        style: TextStyle(color: Colors.white38, fontSize: 11),
+                        style: TextStyle(color: Colors.white38, fontSize: 13),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  GestureDetector(
-                    onTap: widget.onDismiss,
-                    child: Container(
+                  TextButton(
+                    onPressed: widget.onDismiss,
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(48, 48),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                      backgroundColor: Colors.white.withOpacity(0.15),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white24),
+                        side: const BorderSide(color: Colors.white24),
                       ),
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                    ),
+                    child: const Text(
+                      'Done',
+                      semanticsLabel: 'Close obstacle scan',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -439,19 +440,11 @@ class _ScanOverlayState extends State<ScanOverlay> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
-
-                  // Timer hint
-                  const Text(
-                    'Tap anywhere to close',
-                    style: TextStyle(color: Colors.white30, fontSize: 12),
-                  ),
                 ],
               ),
             ),
           ),
         ],
-      ),
     );
   }
 }
